@@ -1,0 +1,243 @@
+# ==========================
+# Spring Boot 核心配置
+# ==========================
+spring:
+  # AI 配置
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: tinyllama
+        options:
+          temperature: 0.8
+          top-p: 0.9
+          num-predict: 128
+
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/medical_booking?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    username: root
+    password: x20040122
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA 配置
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        use_sql_comments: true
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: x20040122
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  # 缓存配置
+  cache:
+    type: none
+    redis:
+      time-to-live: 1800000
+      cache-null-values: false
+
+  # Spring Security 配置
+  security:
+    user:
+      name: sayrain
+      password: x20040122
+
+  # 开发工具配置
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  # Servlet 配置（用于文件上传）
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      enabled: true
+
+  # 应用配置
+  application:
+    name: medical-booking-system
+
+# ==========================
+# 日志配置
+# ==========================
+logging:
+  level:
+    root: info
+    com.sayrain.medicalbooking: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    org.springframework.transaction: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.stat: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.springframework.ai: DEBUG
+    com.sayrain.ai: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/medical-booking.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+
+# ==========================
+# 服务器配置
+# ==========================
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 8192
+    accept-count: 100
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+# ==========================
+# SpringDoc OpenAPI 配置
+# ==========================
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+    filter: true
+  info:
+    title: 智能医疗挂号系统 API
+    description: 基于Spring Boot的智能医疗挂号系统接口文档
+    version: 1.0.0
+    contact:
+      name: sayrain
+      email: sayrain@example.com
+    license:
+      name: Apache 2.0
+      url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+# ==========================
+# JWT 配置（根据您的项目需要）
+# ==========================
+jwt:
+  secret: medical-booking-system-secret-key-2024-spring-boot-3-jwt-token
+  expiration: 86400000 # 24小时
+  header: Authorization
+  prefix: "Bearer "
+
+# ==========================
+# 文件上传配置
+# ==========================
+file:
+  upload:
+    base-path: ./uploads
+    max-size: 5242880
+    allowed-extensions:
+      - jpg
+      - jpeg
+      - png
+      - gif
+      - pdf
+      - doc
+      - docx
+
+# ==========================
+# 应用信息配置
+# ==========================
+info:
+  app:
+    name: 智能医疗挂号系统
+    version: 1.0.0
+    description: 基于Spring Boot的智能医疗挂号服务平台
+    author: sayrain
+    email: sayrain@example.com
+
+# ==========================
+# 自定义业务配置
+# ==========================
+medical:
+  booking:
+    # 预约相关配置
+    appointment:
+      max-days-ahead: 30        # 最大可预约天数
+      cancel-before-hours: 2    # 可取消预约的小时数
+      max-daily-appointments: 50 # 每日最大预约数
+
+    # 医生排班配置
+    schedule:
+      work-start-time: "08:00"  # 工作开始时间
+      work-end-time: "18:00"    # 工作结束时间
+      slot-duration: 30         # 时间段时长（分钟）
+
+    # 系统通知配置
+    notification:
+      email-enabled: false      # 邮件通知开关
+      sms-enabled: false        # 短信通知开关
+      wechat-enabled: true      # 微信通知开关
+
+# ==========================
+# 邮件配置（可选）
+# ==========================
+#mail:
+#  host: smtp.example.com
+#  port: 587
+#  username: your-email@example.com
+#  password: your-password
+#  properties:
+#    mail:
+#      smtp:
+#        auth: true
+#        starttls:
+#          enable: true
+
+# ==========================
+# 短信配置（可选）
+# ==========================
+#sms:
+#  provider: aliyun
+#  access-key: your-access-key
+#  access-secret: your-access-secret
+#  sign-name: 医疗挂号系统
+#  template-code: SMS_123456789
