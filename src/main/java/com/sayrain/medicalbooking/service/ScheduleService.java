@@ -23,8 +23,14 @@ public interface ScheduleService {
     // 获取所有排班
     List<Schedule> getAllSchedules();
 
+    // 获取所有排班（DTO格式）
+    List<ScheduleDTO> getAllSchedulesAsDTO();
+
     // 根据医生ID获取排班
     List<Schedule> getSchedulesByDoctor(Long doctorId);
+
+    // 根据医生ID获取排班（DTO格式）
+    List<ScheduleDTO> getSchedulesByDoctorAsDTO(Long doctorId);
 
     // 根据日期范围获取排班
     List<Schedule> getSchedulesByDateRange(LocalDate startDate, LocalDate endDate);

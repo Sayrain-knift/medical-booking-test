@@ -1,0 +1,97 @@
+name: medical-booking-stack
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: medical_mysql
+    restart: unless-stopped
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: x20040122
+      MYSQL_DATABASE: medical_booking
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: redis:7.2
+    container_name: medical_redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "x20040122"]
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: medical_rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  nacos:
+    image: nacos/nacos-server:v2.4.0
+    container_name: medical_nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: "false"
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos-data:/home/nacos/data
+
+  sentinel:
+    image: bladex/sentinel-dashboard:1.8.6
+    container_name: medical_sentinel
+    restart: unless-stopped
+    environment:
+      SENTINEL_DASHBOARD_AUTH_USERNAME: sentinel
+      SENTINEL_DASHBOARD_AUTH_PASSWORD: sentinel
+      JAVA_OPTS: "-Dserver.port=8858"
+    ports:
+      - "8858:8858"
+
+  medical-booking:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medical_booking_app
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+      - nacos
+      - sentinel
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/medical_booking?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: x20040122
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PASSWORD: x20040122
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      NACOS_SERVER: nacos:8848
+      SENTINEL_DASHBOARD: sentinel:8858
+      TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+  nacos-data:

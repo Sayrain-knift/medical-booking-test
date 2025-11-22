@@ -3,15 +3,19 @@ package com.sayrain.medicalbooking.repository;
 import com.sayrain.medicalbooking.model.Appointment;
 import com.sayrain.medicalbooking.model.Appointment.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
-public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
 
     // 根据患者ID查询预约
     List<Appointment> findByPatientId(Long patientId);
@@ -48,4 +52,14 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT a FROM Appointment a WHERE a.schedule.id = :scheduleId")
     List<Appointment> findByScheduleIdWithLock(@Param("scheduleId") Long scheduleId);
+
+    // 新增：患者预约分页查询
+    Page<Appointment> findByPatientId(Long patientId, Pageable pageable);
+
+    // 新增：医生相关预约分页查询（需要根据你的业务逻辑调整）
+    @Query("SELECT a FROM Appointment a WHERE a.schedule.doctor.id = :doctorId")
+    Page<Appointment> findByDoctorId(@Param("doctorId") Long doctorId, Pageable pageable);
+
+    // 新增：按状态分页查询
+    Page<Appointment> findByStatus(AppointmentStatus status, Pageable pageable);
 }

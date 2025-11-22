@@ -1,0 +1,181 @@
+# ==========================
+# Spring Boot 核心配置 - 最小化开发环境
+# ==========================
+spring:
+  # 启用Nacos服务发现和配置中心
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: localhost:8848
+        namespace: public
+        group: DEFAULT_GROUP
+        service: medical-booking-system
+        username: nacos
+        password: nacos
+      config:
+        enabled: false
+    sentinel:
+      enabled: true
+      transport:
+        dashboard: localhost:8858
+        port: 8719
+  rabbitmq:
+    enabled: false
+
+  # 数据源配置 - 使用H2内存数据库
+  datasource:
+    url: jdbc:h2:mem:medical_booking;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+
+  # H2 控制台配置
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  # JPA 配置
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        use_sql_comments: true
+
+  # Spring Security 配置
+  security:
+    user:
+      name: sayrain
+      password: dev123456
+
+  # 应用配置
+  application:
+    name: medical-booking-system
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: x20040122
+      database: 0
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  # 缓存配置
+  cache:
+    type: redis
+    redis:
+      # 默认缓存过期时间：30分钟
+      time-to-live: 1800000
+      # 不缓存null值
+      cache-null-values: false
+      # 缓存键前缀
+      key-prefix: "medical:cache:"
+      # 使用键前缀
+      use-key-prefix: true
+
+  # Jackson 配置
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+    modules:
+      - com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+
+# ==========================
+# 日志配置
+# ==========================
+logging:
+  level:
+    root: info
+    com.sayrain.medicalbooking: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    com.alibaba.nacos: ERROR
+    com.alibaba.cloud: ERROR
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+
+# ==========================
+# 服务器配置
+# ==========================
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# ==========================
+# SpringDoc OpenAPI 配置
+# ==========================
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# ==========================
+# JWT 配置
+# ==========================
+jwt:
+  secret: medical-booking-system-secret-key-2024-spring-boot-3-jwt-token-dev
+  expiration: 86400000 # 24小时
+  header: Authorization
+  prefix: "Bearer "
+
+# ==========================
+# 文件上传配置
+# ==========================
+file:
+  upload:
+    base-path: ./uploads
+    max-size: 5242880
+    allowed-extensions:
+      - jpg
+      - jpeg
+      - png
+      - gif
+      - pdf
+      - doc
+      - docx
+
+# ==========================
+# 自定义业务配置
+# ==========================
+medical:
+  booking:
+    appointment:
+      max-days-ahead: 30
+      cancel-before-hours: 2
+      max-daily-appointments: 50
+    schedule:
+      work-start-time: "08:00"
+      work-end-time: "18:00"
+      slot-duration: 30
+    notification:
+      email-enabled: false
+      sms-enabled: false
+      wechat-enabled: false

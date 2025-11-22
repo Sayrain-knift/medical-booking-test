@@ -32,7 +32,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {
+                "spring.cloud.nacos.discovery.enabled=false",
+                "spring.cloud.nacos.discovery.register-enabled=false",
+                "spring.cloud.nacos.config.enabled=false",
+                "spring.cloud.compatibility-verifier.enabled=false"
+        })
 @ActiveProfiles("test")
 // 移除 @Transactional 注解，改为手动管理数据
 class AppointmentFlowIntegrationTest {
@@ -136,6 +142,11 @@ class AppointmentFlowIntegrationTest {
         when(redisService.cacheDepartment(any(Department.class))).thenReturn(true);
         when(redisService.clearDepartmentCache()).thenReturn(true);
         when(redisService.cacheDepartment(anyList())).thenReturn(true);
+        
+        // 配置医生缓存相关的mock
+        when(redisService.getCachedDoctorsByDepartment(departmentId)).thenReturn(null); // 模拟缓存中没有数据
+        when(redisService.cacheDoctorsByDepartment(any(Long.class), any(List.class))).thenReturn(true);
+        when(redisService.clearDoctorCache(any(Long.class))).thenReturn(true);
     }
 
     @AfterEach
@@ -217,30 +228,55 @@ class AppointmentFlowIntegrationTest {
         // -----------------------
         // 4) 根据科室ID查询医生
         // -----------------------
-        ResponseEntity<ResponseResult<List<DoctorDTO>>> doctorsResp = restTemplate.exchange(
+        ResponseEntity<ResponseResult<List<Doctor>>> doctorsResp = restTemplate.exchange(
                 "/api/doctors/department/" + deptId,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
-                new ParameterizedTypeReference<ResponseResult<List<DoctorDTO>>>() {
+                new ParameterizedTypeReference<ResponseResult<List<Doctor>>>() {
                 }
         );
 
+        // 打印响应信息用于调试
+        System.out.println("=== 医生查询响应调试信息 ===");
+        System.out.println("响应状态码: " + doctorsResp.getStatusCode());
+        System.out.println("响应头: " + doctorsResp.getHeaders());
+        if (doctorsResp.getBody() != null) {
+            System.out.println("响应体: " + doctorsResp.getBody());
+            System.out.println("响应数据: " + doctorsResp.getBody().getData());
+        } else {
+            System.out.println("响应体为null");
+        }
+        System.out.println("科室ID: " + deptId);
+        System.out.println("========================");
+
         // 如果医生列表为空，可能是数据还未同步，我们重试几次
-        List<DoctorDTO> doctorList = null;
+        List<Doctor> doctorList = null;
         for (int i = 0; i < 3; i++) {
+            System.out.println("=== 重试第 " + (i + 1) + " 次查询医生 ===");
             doctorsResp = restTemplate.exchange(
                     "/api/doctors/department/" + deptId,
                     HttpMethod.GET,
                     new HttpEntity<>(headers),
-                    new ParameterizedTypeReference<ResponseResult<List<DoctorDTO>>>() {
+                    new ParameterizedTypeReference<ResponseResult<List<Doctor>>>() {
                     }
             );
+
+            System.out.println("状态码: " + doctorsResp.getStatusCode());
+            if (doctorsResp.getBody() != null) {
+                System.out.println("响应体: " + doctorsResp.getBody());
+                System.out.println("响应code: " + doctorsResp.getBody().getCode());
+                System.out.println("响应message: " + doctorsResp.getBody().getMessage());
+                System.out.println("响应数据: " + doctorsResp.getBody().getData());
+            } else {
+                System.out.println("响应体为null");
+            }
 
             if (doctorsResp.getStatusCode() == HttpStatus.OK &&
                     doctorsResp.getBody() != null &&
                     doctorsResp.getBody().getData() != null &&
                     !doctorsResp.getBody().getData().isEmpty()) {
                 doctorList = doctorsResp.getBody().getData();
+                System.out.println("找到医生列表，大小: " + doctorList.size());
                 break;
             }
 

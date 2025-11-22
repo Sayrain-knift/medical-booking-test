@@ -41,16 +41,42 @@ public class SecurityConfig {
         // 配置会话管理
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // 配置授权
+        // 配置授权 - 添加前端静态资源路径
         http.authorizeHttpRequests(authz -> authz
+                // 放行前端静态资源路径和HTML页面
+                .requestMatchers("/", "/index.html", "/register.html", "/login.html", "/doctors.html", "/appointment.html", "/ai-consultation.html", "/profile.html", "/appointments.html", "/test-pages.html").permitAll()
+                .requestMatchers("/static/**", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                //科室接口
-                .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()  // 允许公开查看科室
-                .requestMatchers(HttpMethod.POST, "/api/departments/**").hasRole("ADMIN")    // 仅管理员可新增
-                .requestMatchers(HttpMethod.PUT, "/api/departments/**").hasRole("ADMIN")     // 仅管理员可修改
-                .requestMatchers(HttpMethod.DELETE, "/api/departments/**").hasRole("ADMIN")  // 仅管理员可删除
+
+                // 🔥 新增：预约接口权限配置
+                .requestMatchers(HttpMethod.GET, "/api/appointments/**").hasAnyRole("ADMIN", "DOCTOR", "PATIENT") // 管理员、医生、患者都可以查看
+                .requestMatchers(HttpMethod.POST, "/api/appointments/**").hasAnyRole("PATIENT", "ADMIN")          // 患者和管理员可以创建预约
+                .requestMatchers(HttpMethod.PUT, "/api/appointments/**").hasAnyRole("ADMIN", "DOCTOR")            // 管理员和医生可以更新预约
+                .requestMatchers(HttpMethod.DELETE, "/api/appointments/**").hasAnyRole("ADMIN", "PATIENT")        // 管理员和患者可以取消预约
+                .requestMatchers(HttpMethod.PATCH, "/api/appointments/**").hasAnyRole("ADMIN", "DOCTOR")          // 管理员和医生可以更新状态
+
+                // 🔥 新增：排班接口权限配置
+                .requestMatchers(HttpMethod.GET, "/api/schedules/**").permitAll()      // 允许公开查看排班
+                .requestMatchers(HttpMethod.POST, "/api/schedules/**").hasRole("ADMIN")    // 仅管理员可新增排班
+                .requestMatchers(HttpMethod.PUT, "/api/schedules/**").hasRole("ADMIN")     // 仅管理员可修改排班
+                .requestMatchers(HttpMethod.DELETE, "/api/schedules/**").hasRole("ADMIN")  // 仅管理员可删除排班
+                .requestMatchers(HttpMethod.PATCH, "/api/schedules/**").hasRole("ADMIN")   // 仅管理员可更新状态
+
+                // 🔥 新增：医生接口权限配置
+                .requestMatchers(HttpMethod.GET, "/api/doctors/**").permitAll()        // 允许公开查看医生
+                .requestMatchers(HttpMethod.POST, "/api/doctors/**").hasRole("ADMIN")      // 仅管理员可新增医生
+                .requestMatchers(HttpMethod.PUT, "/api/doctors/**").hasRole("ADMIN")       // 仅管理员可修改医生
+                .requestMatchers(HttpMethod.DELETE, "/api/doctors/**").hasRole("ADMIN")    // 仅管理员可删除医生
+
+                // 科室接口
+                .requestMatchers(HttpMethod.GET, "/api/departments/**").permitAll()    // 允许公开查看科室
+                .requestMatchers(HttpMethod.POST, "/api/departments/**").hasRole("ADMIN")  // 仅管理员可新增
+                .requestMatchers(HttpMethod.PUT, "/api/departments/**").hasRole("ADMIN")   // 仅管理员可修改
+                .requestMatchers(HttpMethod.DELETE, "/api/departments/**").hasRole("ADMIN")// 仅管理员可删除
+
                 .requestMatchers("/api/chat/ask").permitAll() // 放行聊天接口
                 .requestMatchers("/error").permitAll() // 放行错误页面接口
+                .requestMatchers("/actuator/**").permitAll() // 放行actuator监控端点
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -69,7 +95,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生科室 - 医疗预约系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+        }
+        
+        .department-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .department-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .department-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+        }
+        
+        .doctor-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .doctor-avatar {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+        
+        .doctor-info {
+            padding: 1.5rem;
+        }
+        
+        .doctor-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .doctor-title {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .doctor-department {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .doctor-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .badge-custom {
+            background: var(--light-color);
+            color: var(--dark-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .filter-section {
+            background: var(--light-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-box input {
+            padding-left: 3rem;
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            height: 50px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .filter-tag {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 2px solid #e9ecef;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tag:hover,
+        .filter-tag.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .section-subtitle {
+            color: var(--secondary-color);
+            margin-bottom: 3rem;
+        }
+        
+        .load-more {
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stats-label {
+            color: var(--secondary-color);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-hospital text-primary me-2"></i>医疗预约系统
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/doctors.html">医生科室</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointment.html">预约挂号</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ai-consultation.html">AI问诊</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile.html">个人中心</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <div id="userSection" class="d-none">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span id="username">用户</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile.html">个人中心</a></li>
+                                <li><a class="dropdown-item" href="/appointments.html">我的预约</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="authManager.logout()">退出登录</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="authSection">
+                        <a href="/login.html" class="btn btn-outline-primary me-2">登录</a>
+                        <a href="/register.html" class="btn btn-primary">注册</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main style="padding-top: 80px;">
+        <!-- 英雄区域 -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <h1 class="display-4 fw-bold mb-4">专业医疗团队</h1>
+                        <p class="lead mb-4">汇聚各科室资深专家，为您提供专业的医疗服务</p>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-people-fill me-3" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <h3 class="h5 mb-0">500+</h3>
+                                        <p class="mb-0">专业医生</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-building me-3" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <h3 class="h5 mb-0">20+</h3>
+                                        <p class="mb-0">临床科室</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <img src="https://via.placeholder.com/600x400/0056b3/ffffff?text=医疗团队" 
+                             alt="医疗团队" class="img-fluid rounded-3">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- 统计数据 -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="bi bi-person-badge stats-icon text-primary mb-3" style="font-size: 2rem;"></i>
+                        <div class="stats-number" id="totalDoctors">0</div>
+                        <div class="stats-label">医生总数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="bi bi-building stats-icon text-info mb-3" style="font-size: 2rem;"></i>
+                        <div class="stats-number" id="totalDepartments">0</div>
+                        <div class="stats-label">科室数量</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="bi bi-calendar-check stats-icon text-success mb-3" style="font-size: 2rem;"></i>
+                        <div class="stats-number" id="todayAppointments">0</div>
+                        <div class="stats-label">今日预约</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <i class="bi bi-star-fill stats-icon text-warning mb-3" style="font-size: 2rem;"></i>
+                        <div class="stats-number">4.8</div>
+                        <div class="stats-label">平均评分</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 科室展示 -->
+            <section class="mb-5">
+                <h2 class="section-title">热门科室</h2>
+                <p class="section-subtitle">选择您需要的科室，查看专业医生</p>
+                
+                <div class="row g-4" id="departmentsContainer">
+                    <!-- 科室卡片将通过JavaScript动态加载 -->
+                </div>
+            </section>
+
+            <!-- 筛选和搜索 -->
+            <section class="filter-section">
+                <h3 class="mb-4">查找医生</h3>
+                
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="form-control" id="doctorSearch" 
+                           placeholder="搜索医生姓名、科室或专业领域...">
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">科室筛选</label>
+                        <select class="form-select" id="departmentFilter">
+                            <option value="">全部科室</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">职称筛选</label>
+                        <select class="form-select" id="titleFilter">
+                            <option value="">全部职称</option>
+                            <option value="主任医师">主任医师</option>
+                            <option value="副主任医师">副主任医师</option>
+                            <option value="主治医师">主治医师</option>
+                            <option value="住院医师">住院医师</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <label class="form-label">快速筛选</label>
+                    <div class="filter-tags">
+                        <div class="filter-tag" data-filter="expert">专家号</div>
+                        <div class="filter-tag" data-filter="available">今日可约</div>
+                        <div class="filter-tag" data-filter="weekend">周末出诊</div>
+                        <div class="filter-tag" data-filter="online">在线问诊</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 医生列表 -->
+            <section>
+                <h2 class="section-title">推荐医生</h2>
+                <p class="section-subtitle">为您推荐优秀的医疗专家</p>
+                
+                <div class="row g-4" id="doctorsContainer">
+                    <!-- 医生卡片将通过JavaScript动态加载 -->
+                </div>
+                
+                <div class="load-more">
+                    <button class="btn btn-outline-primary btn-lg" id="loadMoreBtn">
+                        <i class="bi bi-arrow-down-circle me-2"></i>加载更多医生
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="bi bi-hospital me-2"></i>医疗预约系统</h5>
+                    <p>为您提供便捷、专业的医疗预约服务</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-white-50">首页</a></li>
+                        <li><a href="/doctors.html" class="text-white-50">医生科室</a></li>
+                        <li><a href="/appointment.html" class="text-white-50">预约挂号</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>联系我们</h5>
+                    <p><i class="bi bi-telephone me-2"></i>400-123-4567</p>
+                    <p><i class="bi bi-envelope me-2"></i>support@medical.com</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/doctors.js"></script>
+</body>
+</html>

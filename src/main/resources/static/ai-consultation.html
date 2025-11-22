@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能问诊 - 医疗预约系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .chat-container {
+            height: 600px;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-messages {
+            height: calc(100% - 140px);
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message.ai {
+            justify-content: flex-start;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .message.user .message-bubble {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.ai .message-bubble {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .message.user .message-avatar {
+            background: var(--primary-color);
+            color: white;
+            order: 1;
+        }
+        
+        .message.ai .message-avatar {
+            background: #e9ecef;
+            color: var(--primary-color);
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+        
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #e9ecef;
+            background: white;
+        }
+        
+        .input-group {
+            max-width: 100%;
+        }
+        
+        .chat-input input {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .chat-input button {
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            border-bottom-left-radius: 5px;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+        
+        .typing-indicator.show {
+            display: flex;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6c757d;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .quick-actions {
+            padding: 1rem;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .quick-action-btn {
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            background: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .sidebar h5 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .symptom-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            background: #f8f9fa;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .symptom-tag:hover,
+        .symptom-tag.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-card h6 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .disclaimer h6 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+        
+        .disclaimer p {
+            color: #856404;
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+        
+        .voice-input-btn {
+            position: relative;
+        }
+        
+        .voice-input-btn.recording {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-hospital text-primary me-2"></i>医疗预约系统
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/doctors.html">医生科室</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointment.html">预约挂号</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/ai-consultation.html">AI问诊</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile.html">个人中心</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <div id="userSection" class="d-none">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span id="username">用户</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile.html">个人中心</a></li>
+                                <li><a class="dropdown-item" href="/appointments.html">我的预约</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="authManager.logout()">退出登录</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="authSection">
+                        <a href="/login.html" class="btn btn-outline-primary me-2">登录</a>
+                        <a href="/register.html" class="btn btn-primary">注册</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面头部 -->
+    <section class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-3">AI智能问诊</h1>
+                    <p class="lead mb-0">基于人工智能的医疗健康咨询服务，为您提供专业的健康指导</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <h6><i class="bi bi-robot me-2"></i>AI助手在线</h6>
+                        <p class="mb-0">24小时为您提供健康咨询服务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容 -->
+    <main class="container">
+        <div class="row">
+            <!-- 左侧边栏 -->
+            <div class="col-lg-3">
+                <!-- 常见症状 -->
+                <div class="sidebar">
+                    <h5><i class="bi bi-clipboard2-pulse me-2"></i>常见症状</h5>
+                    <div class="symptoms-container">
+                        <div class="symptom-tag" onclick="selectSymptom(this, '头痛')">头痛</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '发热')">发热</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '咳嗽')">咳嗽</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '胸痛')">胸痛</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '腹痛')">腹痛</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '恶心')">恶心</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '疲劳')">疲劳</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '失眠')">失眠</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '关节痛')">关节痛</div>
+                        <div class="symptom-tag" onclick="selectSymptom(this, '皮疹')">皮疹</div>
+                    </div>
+                </div>
+
+                <!-- 使用指南 -->
+                <div class="sidebar">
+                    <h5><i class="bi bi-info-circle me-2"></i>使用指南</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            描述您的症状和不适
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            AI会询问相关问题
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            获得健康建议和指导
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            必要时建议就医检查
+                        </li>
+                    </ul>
+                    
+                    <div class="disclaimer">
+                        <h6><i class="bi bi-exclamation-triangle me-1"></i>免责声明</h6>
+                        <p>AI问诊仅供参考，不能替代专业医疗诊断。如有紧急情况请及时就医。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聊天区域 -->
+            <div class="col-lg-9">
+                <div class="chat-container">
+                    <!-- 聊天头部 -->
+                    <div class="chat-header">
+                        <div class="d-flex align-items-center">
+                            <div class="message-avatar" style="background: white; color: var(--primary-color); margin-right: 1rem;">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">AI医疗助手</h6>
+                                <small class="ai-status">
+                                    <span class="status-dot"></span>
+                                    在线服务中
+                                </small>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-light" onclick="clearChat()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>重新开始
+                        </button>
+                    </div>
+
+                    <!-- 聊天消息区域 -->
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- AI欢迎消息 -->
+                        <div class="message ai">
+                            <div class="message-avatar">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div>
+                                <div class="message-bubble">
+                                    您好！我是AI医疗助手，很高兴为您服务。请告诉我您有什么健康方面的困扰，我会尽力为您提供专业的建议和指导。
+                                </div>
+                                <div class="message-time">刚刚</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 打字指示器 -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="message-avatar">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+
+                    <!-- 快捷操作 -->
+                    <div class="quick-actions">
+                        <div class="d-flex flex-wrap">
+                            <button class="quick-action-btn" onclick="sendQuickMessage('我感觉不舒服')">
+                                我感觉不舒服
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('头痛怎么办')">
+                                头痛怎么办
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('发烧了需要就医吗')">
+                                发烧了需要就医吗
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('如何预防感冒')">
+                                如何预防感冒
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('推荐相关科室')">
+                                推荐相关科室
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 输入区域 -->
+                    <div class="chat-input">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="messageInput" 
+                                   placeholder="请描述您的症状或健康问题..." 
+                                   onkeypress="handleKeyPress(event)">
+                            <button class="btn btn-outline-secondary voice-input-btn" id="voiceBtn" 
+                                    onclick="toggleVoiceInput()" title="语音输入">
+                                <i class="bi bi-mic"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="sendMessage()">
+                                <i class="bi bi-send me-1"></i>发送
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-light text-muted py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-dark">医疗预约系统</h5>
+                    <p>为您提供便捷的在线医疗预约服务</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-dark">快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-muted text-decoration-none">首页</a></li>
+                        <li><a href="/doctors.html" class="text-muted text-decoration-none">医生科室</a></li>
+                        <li><a href="/appointment.html" class="text-muted text-decoration-none">预约挂号</a></li>
+                        <li><a href="/ai-consultation.html" class="text-muted text-decoration-none">AI问诊</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-dark">联系我们</h5>
+                    <p><i class="bi bi-telephone me-2"></i>400-888-8888</p>
+                    <p><i class="bi bi-envelope me-2"></i>support@medical.com</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p>&copy; 2024 医疗预约系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // 全局变量
+        let isRecording = false;
+        let recognition = null;
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeVoiceRecognition();
+            initializeChat();
+        });
+
+        // 初始化语音识别
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'zh-CN';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('messageInput').value = transcript;
+                    stopVoiceInput();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('语音识别错误:', event.error);
+                    Utils.showMessage('语音识别失败，请重试', 'error');
+                    stopVoiceInput();
+                };
+
+                recognition.onend = function() {
+                    stopVoiceInput();
+                };
+            }
+        }
+
+        // 初始化聊天
+        function initializeChat() {
+            // 聚焦输入框
+            document.getElementById('messageInput').focus();
+        }
+
+        // 选择症状
+        function selectSymptom(element, symptom) {
+            // 切换选中状态
+            element.classList.toggle('selected');
+            
+            // 发送症状描述
+            if (element.classList.contains('selected')) {
+                sendQuickMessage(`我有${symptom}的症状`);
+            }
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) {
+                return;
+            }
+
+            addUserMessage(message);
+            input.value = '';
+            
+            // 显示AI思考状态
+            showTypingIndicator();
+            
+            // 模拟AI回复
+            setTimeout(() => {
+                hideTypingIndicator();
+                generateAIResponse(message);
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // 发送快捷消息
+        function sendQuickMessage(message) {
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
+
+        // 添加用户消息
+        function addUserMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageHTML = `
+                <div class="message user">
+                    <div>
+                        <div class="message-bubble">
+                            ${escapeHtml(message)}
+                        </div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                    <div class="message-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            scrollToBottom();
+        }
+
+        // 添加AI消息
+        function addAIMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageHTML = `
+                <div class="message ai">
+                    <div class="message-avatar">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div>
+                        <div class="message-bubble">
+                            ${message}
+                        </div>
+                        <div class="message-time">${getCurrentTime()}</div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+            scrollToBottom();
+        }
+
+        // 生成AI回复
+        function generateAIResponse(userMessage) {
+            const responses = [
+                {
+                    keywords: ['头痛', '头疼', '偏头痛'],
+                    response: '头痛可能由多种原因引起，如紧张、睡眠不足、眼部疲劳等。建议您：<br>1. 充分休息，保证充足睡眠<br>2. 避免长时间看屏幕<br>3. 适当按摩太阳穴<br>4. 如持续严重，建议就医检查'
+                },
+                {
+                    keywords: ['发热', '发烧', '体温高'],
+                    response: '发热是身体对抗感染的正常反应。处理建议：<br>1. 多喝温水，保持充足水分<br>2. 物理降温，如温水擦浴<br>3. 体温超过38.5°C可考虑退烧药<br>4. 如持续高热或伴有其他严重症状，请及时就医'
+                },
+                {
+                    keywords: ['咳嗽', '咳'],
+                    response: '咳嗽常见于感冒、支气管炎等。建议：<br>1. 多喝温水，保持喉咙湿润<br>2. 避免吸烟和刺激性气味<br>3. 可尝试蜂蜜柠檬水缓解<br>4. 如咳嗽超过2周或伴有呼吸困难，请就医'
+                },
+                {
+                    keywords: ['胸痛', '胸闷'],
+                    response: '胸痛可能涉及心脏、肺部等问题，需要重视：<br>1. 立即停止活动，保持休息<br>2. 如疼痛剧烈或伴有呼吸困难，请立即就医<br>3. 不要自行用药<br>4. 建议尽快到医院做心电图等检查'
+                },
+                {
+                    keywords: ['腹痛', '肚子痛'],
+                    response: '腹痛原因多样，需要根据具体情况判断：<br>1. 注意疼痛位置、性质和持续时间<br>2. 暂时禁食，观察症状变化<br>3. 避免自行用药<br>4. 如疼痛剧烈、持续或伴有发热，请及时就医'
+                }
+            ];
+
+            // 查找匹配的回复
+            let matchedResponse = null;
+            for (const item of responses) {
+                if (item.keywords.some(keyword => userMessage.includes(keyword))) {
+                    matchedResponse = item.response;
+                    break;
+                }
+            }
+
+            // 如果没有匹配的回复，使用默认回复
+            if (!matchedResponse) {
+                const defaultResponses = [
+                    '感谢您的咨询。根据您的描述，我建议您：<br>1. 注意观察症状变化<br>2. 保持良好的作息和饮食习惯<br>3. 适当休息，避免过度劳累<br>4. 如症状持续或加重，请及时就医',
+                    '我理解您的担忧。为了更好地帮助您，建议您：<br>1. 详细描述症状的具体情况<br>2. 注意症状出现的时间和诱因<br>3. 如有需要，我可以为您推荐合适的科室',
+                    '收到您的信息。健康问题需要认真对待：<br>1. 不要忽视身体发出的信号<br>2. 保持积极乐观的心态<br>3. 必要时寻求专业医疗帮助<br>4. 我可以为您推荐相关科室的医生'
+                ];
+                matchedResponse = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            }
+
+            addAIMessage(matchedResponse);
+        }
+
+        // 显示打字指示器
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('show');
+            scrollToBottom();
+        }
+
+        // 隐藏打字指示器
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('show');
+        }
+
+        // 切换语音输入
+        function toggleVoiceInput() {
+            if (isRecording) {
+                stopVoiceInput();
+            } else {
+                startVoiceInput();
+            }
+        }
+
+        // 开始语音输入
+        function startVoiceInput() {
+            if (!recognition) {
+                Utils.showMessage('您的浏览器不支持语音识别功能', 'warning');
+                return;
+            }
+
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceBtn.classList.add('recording');
+            voiceBtn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+            isRecording = true;
+
+            try {
+                recognition.start();
+            } catch (error) {
+                console.error('启动语音识别失败:', error);
+                stopVoiceInput();
+            }
+        }
+
+        // 停止语音输入
+        function stopVoiceInput() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceBtn.classList.remove('recording');
+            voiceBtn.innerHTML = '<i class="bi bi-mic"></i>';
+            isRecording = false;
+
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('停止语音识别失败:', error);
+                }
+            }
+        }
+
+        // 清空聊天
+        function clearChat() {
+            if (confirm('确定要清空聊天记录吗？')) {
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.innerHTML = `
+                    <div class="message ai">
+                        <div class="message-avatar">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div>
+                            <div class="message-bubble">
+                                您好！我是AI医疗助手，很高兴为您服务。请告诉我您有什么健康方面的困扰，我会尽力为您提供专业的建议和指导。
+                            </div>
+                            <div class="message-time">刚刚</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 处理键盘事件
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // 滚动到底部
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 获取当前时间
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>

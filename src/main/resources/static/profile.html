@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 医疗预约系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin: 0 auto 1rem;
+        }
+        
+        .profile-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-role {
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .appointment-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .appointment-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .appointment-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: var(--secondary-color);
+        }
+        
+        .info-value {
+            color: var(--dark-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-sm-custom {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--secondary-color);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--secondary-color);
+            border: none;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            padding: 1rem 1.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background: none;
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-action-card {
+            background: var(--light-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--dark-color);
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-card:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .quick-action-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="bi bi-hospital text-primary me-2"></i>医疗预约系统
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/doctors.html">医生科室</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointment.html">预约挂号</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ai-consultation.html">AI问诊</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/profile.html">个人中心</a>
+                    </li>
+                </ul>
+                
+                <div class="d-flex align-items-center">
+                    <div id="userSection" class="d-none">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <span id="username">用户</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/profile.html">个人中心</a></li>
+                                <li><a class="dropdown-item" href="/appointments.html">我的预约</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="authManager.logout()">退出登录</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="authSection">
+                        <a href="/login.html" class="btn btn-outline-primary me-2">登录</a>
+                        <a href="/register.html" class="btn btn-primary">注册</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main style="padding-top: 80px;">
+        <!-- 个人信息头部 -->
+        <section class="profile-header">
+            <div class="container">
+                <div class="text-center">
+                    <div class="profile-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h1 class="profile-name" id="profileName">用户姓名</h1>
+                    <p class="profile-role" id="profileRole">患者</p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalAppointments">0</span>
+                            <span class="stat-label">总预约</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="completedAppointments">0</span>
+                            <span class="stat-label">已完成</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="upcomingAppointments">0</span>
+                            <span class="stat-label">待就诊</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- 快捷操作 -->
+            <div class="quick-actions">
+                <a href="/appointment.html" class="quick-action-card">
+                    <i class="bi bi-calendar-plus"></i>
+                    <div>预约挂号</div>
+                </a>
+                <a href="/appointments.html" class="quick-action-card">
+                    <i class="bi bi-calendar-check"></i>
+                    <div>我的预约</div>
+                </a>
+                <a href="/ai-consultation.html" class="quick-action-card">
+                    <i class="bi bi-robot"></i>
+                    <div>AI问诊</div>
+                </a>
+                <a href="/doctors.html" class="quick-action-card">
+                    <i class="bi bi-hospital"></i>
+                    <div>医生科室</div>
+                </a>
+            </div>
+
+            <!-- 个人信息 -->
+            <div class="content-section">
+                <h2 class="section-title">
+                    <i class="bi bi-person-badge"></i>
+                    个人信息
+                </h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">用户名</span>
+                            <span class="info-value" id="infoUsername">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">邮箱</span>
+                            <span class="info-value" id="infoEmail">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">手机号</span>
+                            <span class="info-value" id="infoPhone">-</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">用户类型</span>
+                            <span class="info-value" id="infoRole">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">注册时间</span>
+                            <span class="info-value" id="infoRegTime">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">账户状态</span>
+                            <span class="info-value">
+                                <span class="badge bg-success">正常</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-end mt-3">
+                    <button class="btn btn-outline-primary" onclick="editProfile()">
+                        <i class="bi bi-pencil me-1"></i>编辑资料
+                    </button>
+                </div>
+            </div>
+
+            <!-- 最近预约 -->
+            <div class="content-section">
+                <h2 class="section-title">
+                    <i class="bi bi-clock-history"></i>
+                    最近预约
+                </h2>
+                
+                <div id="recentAppointments">
+                    <div class="empty-state">
+                        <i class="bi bi-calendar-x"></i>
+                        <p>暂无预约记录</p>
+                        <a href="/appointment.html" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>立即预约
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-light text-muted py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-dark">医疗预约系统</h5>
+                    <p>为您提供便捷的在线医疗预约服务</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-dark">快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/" class="text-muted text-decoration-none">首页</a></li>
+                        <li><a href="/doctors.html" class="text-muted text-decoration-none">医生科室</a></li>
+                        <li><a href="/appointment.html" class="text-muted text-decoration-none">预约挂号</a></li>
+                        <li><a href="/ai-consultation.html" class="text-muted text-decoration-none">AI问诊</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-dark">联系我们</h5>
+                    <p><i class="bi bi-telephone me-2"></i>400-888-8888</p>
+                    <p><i class="bi bi-envelope me-2"></i>support@medical.com</p>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p>&copy; 2024 医疗预约系统. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js?v=20240102"></script>
+    <script src="/js/auth.js?v=20240102"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 调试信息
+            console.log('=== API调试信息 ===');
+            console.log('window.api:', window.api);
+            console.log('window.ApiService:', window.ApiService);
+            console.log('api.appointments:', window.api ? window.api.appointments : 'api未定义');
+            console.log('api.appointments.getMyAppointments:', window.api && window.api.appointments ? window.api.appointments.getMyAppointments : 'appointments未定义');
+            
+            // 等待一小段时间确保脚本加载完成
+            setTimeout(() => {
+                console.log('=== 延迟检查 ===');
+                console.log('延迟检查 - api.appointments:', window.api ? window.api.appointments : 'api未定义');
+                
+                loadUserProfile();
+                loadRecentAppointments();
+            }, 100);
+        });
+
+        // 加载用户信息
+        async function loadUserProfile() {
+            try {
+                const user = auth.getCurrentUser();
+                if (user) {
+                    // 更新页面显示
+                    document.getElementById('profileName').textContent = user.username || '用户姓名';
+                    document.getElementById('profileRole').textContent = getRoleDisplayName(user.role);
+                    document.getElementById('infoUsername').textContent = user.username || '-';
+                    document.getElementById('infoEmail').textContent = user.email || '-';
+                    document.getElementById('infoPhone').textContent = user.phone || '-';
+                    document.getElementById('infoRole').textContent = getRoleDisplayName(user.role);
+                    document.getElementById('infoRegTime').textContent = user.createdAt ? 
+                        Utils.formatDate(user.createdAt) : '-';
+
+                    // 加载预约统计
+                    await loadAppointmentStats();
+                }
+            } catch (error) {
+                console.error('加载用户信息失败:', error);
+                Utils.showMessage('加载用户信息失败', 'error');
+            }
+        }
+
+        // 获取角色显示名称
+        function getRoleDisplayName(role) {
+            const roleMap = {
+                'PATIENT': '患者',
+                'DOCTOR': '医生',
+                'ADMIN': '管理员'
+            };
+            return roleMap[role] || '未知';
+        }
+
+        // 加载预约统计
+        async function loadAppointmentStats() {
+            try {
+                const response = await ApiService.appointments.getMyAppointments();
+                const appointments = response.data || [];
+                
+                const total = appointments.length;
+                const completed = appointments.filter(apt => apt.status === 'COMPLETED').length;
+                const upcoming = appointments.filter(apt => 
+                    apt.status === 'PENDING' || apt.status === 'CONFIRMED'
+                ).length;
+
+                document.getElementById('totalAppointments').textContent = total;
+                document.getElementById('completedAppointments').textContent = completed;
+                document.getElementById('upcomingAppointments').textContent = upcoming;
+            } catch (error) {
+                console.error('加载预约统计失败:', error);
+            }
+        }
+
+        // 加载最近预约
+        async function loadRecentAppointments() {
+            try {
+                // 使用ApiService而不是api
+                const response = await ApiService.appointments.getMyAppointments({ size: 5 });
+                const appointments = response.data || [];
+                
+                const container = document.getElementById('recentAppointments');
+                
+                if (appointments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-calendar-x"></i>
+                            <p>暂无预约记录</p>
+                            <a href="/appointment.html" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-1"></i>立即预约
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = appointments.map(appointment => `
+                    <div class="appointment-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h6 class="mb-0 me-2">${appointment.doctorName || '医生'}</h6>
+                                    <span class="appointment-status ${getStatusClass(appointment.status)}">
+                                        ${getStatusText(appointment.status)}
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-1">
+                                    <i class="bi bi-hospital me-1"></i>${appointment.departmentName || '科室'}
+                                </p>
+                                <p class="text-muted mb-0">
+                                    <i class="bi bi-calendar me-1"></i>${appointment.appointmentDate || '日期'}
+                                    <i class="bi bi-clock ms-2 me-1"></i>${appointment.timeSlot || '时间'}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary btn-sm-custom" 
+                                            onclick="viewAppointmentDetail('${appointment.id}')">
+                                        详情
+                                    </button>
+                                    ${appointment.status === 'PENDING' || appointment.status === 'CONFIRMED' ? `
+                                        <button class="btn btn-sm btn-outline-danger btn-sm-custom" 
+                                                onclick="cancelAppointment('${appointment.id}')">
+                                            取消
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('加载最近预约失败:', error);
+                document.getElementById('recentAppointments').innerHTML = `
+                    <div class="alert alert-danger">
+                        加载预约记录失败，请刷新页面重试
+                    </div>
+                `;
+            }
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            const statusMap = {
+                'PENDING': 'status-pending',
+                'CONFIRMED': 'status-confirmed',
+                'COMPLETED': 'status-completed',
+                'CANCELLED': 'status-cancelled'
+            };
+            return statusMap[status] || 'status-pending';
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'PENDING': '待确认',
+                'CONFIRMED': '已确认',
+                'COMPLETED': '已完成',
+                'CANCELLED': '已取消'
+            };
+            return statusMap[status] || '未知';
+        }
+
+        // 查看预约详情
+        function viewAppointmentDetail(appointmentId) {
+            window.location.href = `/appointments.html?id=${appointmentId}`;
+        }
+
+        // 取消预约
+        async function cancelAppointment(appointmentId) {
+            if (!confirm('确定要取消这个预约吗？')) {
+                return;
+            }
+
+            try {
+                await ApiService.appointments.cancel(appointmentId);
+                Utils.showMessage('预约已取消', 'success');
+                loadRecentAppointments();
+                loadAppointmentStats();
+            } catch (error) {
+                console.error('取消预约失败:', error);
+                Utils.showMessage('取消预约失败', 'error');
+            }
+        }
+
+        // 编辑个人资料
+        function editProfile() {
+            Utils.showMessage('个人资料编辑功能正在开发中', 'info');
+        }
+    </script>
+</body>
+</html>

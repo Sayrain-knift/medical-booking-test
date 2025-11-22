@@ -54,6 +54,15 @@ springdoc:
   api-docs:
     enabled: false
 
+# 禁用Nacos服务注册和发现
+cloud:
+  nacos:
+    discovery:
+      enabled: false
+      register-enabled: false
+    config:
+      enabled: false
+
 jwt:
   secret: test_secret_key_123456789012345678901234567890
   expiration: 3600000

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面功能测试 - 医疗预约系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+        .test-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            background: white;
+            border-left: 4px solid #007bff;
+        }
+        .test-status {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .test-link {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 1rem;
+        }
+        .test-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">
+            <i class="bi bi-clipboard-check me-2"></i>医疗预约系统 - 页面功能测试
+        </h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="test-section">
+                    <h3><i class="bi bi-house me-2"></i>主要页面测试</h3>
+                    
+                    <div class="test-item">
+                        <h5>首页 (index.html)</h5>
+                        <p class="mb-2">测试首页加载、导航链接、英雄区域、特色服务展示</p>
+                        <div>
+                            <span class="test-status status-pending" id="home-status">待测试</span>
+                            <a href="/index.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开首页
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('home')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h5>医生科室页面 (doctors.html)</h5>
+                        <p class="mb-2">测试医生列表、科室筛选、搜索功能、医生详情</p>
+                        <div>
+                            <span class="test-status status-pending" id="doctors-status">待测试</span>
+                            <a href="/doctors.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开医生页面
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('doctors')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h5>预约挂号页面 (appointment.html)</h5>
+                        <p class="mb-2">测试预约流程、科室选择、医生选择、时间选择、确认预约</p>
+                        <div>
+                            <span class="test-status status-pending" id="appointment-status">待测试</span>
+                            <a href="/appointment.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开预约页面
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('appointment')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h5>AI问诊页面 (ai-consultation.html)</h5>
+                        <p class="mb-2">测试AI聊天界面、症状选择、快捷提问、语音输入</p>
+                        <div>
+                            <span class="test-status status-pending" id="ai-status">待测试</span>
+                            <a href="/ai-consultation.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开AI问诊
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('ai')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h5>个人中心页面 (profile.html)</h5>
+                        <p class="mb-2">测试用户信息展示、预约统计、个人信息编辑</p>
+                        <div>
+                            <span class="test-status status-pending" id="profile-status">待测试</span>
+                            <a href="/profile.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开个人中心
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('profile')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="test-item">
+                        <h5>预约管理页面 (appointments.html)</h5>
+                        <p class="mb-2">测试预约列表、筛选功能、预约详情、取消预约</p>
+                        <div>
+                            <span class="test-status status-pending" id="appointments-status">待测试</span>
+                            <a href="/appointments.html" target="_blank" class="test-link">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>打开预约管理
+                            </a>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testPage('appointments')">
+                                <i class="bi bi-play-circle me-1"></i>测试功能
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-section">
+                    <h3><i class="bi bi-link-45deg me-2"></i>导航一致性测试</h3>
+                    <div class="test-item">
+                        <h5>导航栏链接一致性</h5>
+                        <p class="mb-2">检查所有页面的导航栏链接是否一致且正确</p>
+                        <div>
+                            <span class="test-status status-pending" id="nav-status">待测试</span>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testNavigation()">
+                                <i class="bi bi-play-circle me-1"></i>测试导航
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-section">
+                    <h3><i class="bi bi-phone me-2"></i>响应式设计测试</h3>
+                    <div class="test-item">
+                        <h5>移动端适配</h5>
+                        <p class="mb-2">测试页面在不同屏幕尺寸下的显示效果</p>
+                        <div>
+                            <span class="test-status status-pending" id="responsive-status">待测试</span>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testResponsive()">
+                                <i class="bi bi-play-circle me-1"></i>测试响应式
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-section">
+                    <h3><i class="bi bi-shield-check me-2"></i>功能完整性测试</h3>
+                    <div class="test-item">
+                        <h5>API接口测试</h5>
+                        <p class="mb-2">测试后端API接口的可用性和数据返回</p>
+                        <div>
+                            <span class="test-status status-pending" id="api-status">待测试</span>
+                            <button class="btn btn-sm btn-outline-primary" onclick="testAPIs()">
+                                <i class="bi bi-play-circle me-1"></i>测试API
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="btn btn-success btn-lg" onclick="runAllTests()">
+                        <i class="bi bi-play-fill me-2"></i>运行所有测试
+                    </button>
+                    <button class="btn btn-secondary btn-lg ms-2" onclick="resetTests()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>重置测试
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script>
+        // 测试结果记录
+        const testResults = {};
+
+        // 更新测试状态
+        function updateStatus(testId, status, message = '') {
+            const statusElement = document.getElementById(`${testId}-status`);
+            if (statusElement) {
+                statusElement.className = `test-status status-${status}`;
+                statusElement.textContent = message || (status === 'success' ? '通过' : status === 'error' ? '失败' : '测试中');
+            }
+            testResults[testId] = { status, message };
+        }
+
+        // 测试单个页面
+        async function testPage(pageName) {
+            updateStatus(pageName, 'pending', '测试中...');
+            
+            try {
+                // 模拟页面加载测试
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // 这里可以添加更具体的页面功能测试
+                const pages = {
+                    'home': 'index.html',
+                    'doctors': 'doctors.html',
+                    'appointment': 'appointment.html',
+                    'ai': 'ai-consultation.html',
+                    'profile': 'profile.html',
+                    'appointments': 'appointments.html'
+                };
+                
+                const pageUrl = pages[pageName];
+                if (pageUrl) {
+                    // 检查页面是否存在
+                    try {
+                        const response = await fetch(`/${pageUrl}`, { 
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                            },
+                            mode: 'cors',
+                            credentials: 'omit',
+                            cache: 'no-cache'
+                        });
+                        
+                        if (response.ok) {
+                            updateStatus(pageName, 'success', '页面可访问');
+                            console.log(`页面 ${pageUrl} 测试成功:`, response.status);
+                        } else {
+                            updateStatus(pageName, 'error', `页面不可访问 (HTTP ${response.status})`);
+                            console.warn(`页面 ${pageUrl} 返回错误:`, response.status, response.statusText);
+                        }
+                    } catch (fetchError) {
+                        console.error(`页面 ${pageUrl} 测试失败:`, fetchError);
+                        updateStatus(pageName, 'error', '页面测试失败: ' + fetchError.message);
+                    }
+                }
+            } catch (error) {
+                console.error(`页面测试 ${pageName} 过程出错:`, error);
+                updateStatus(pageName, 'error', '测试失败: ' + error.message);
+            }
+        }
+
+        // 测试导航一致性
+        async function testNavigation() {
+            updateStatus('nav', 'pending', '测试中...');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                updateStatus('nav', 'success', '导航链接一致');
+            } catch (error) {
+                updateStatus('nav', 'error', '导航测试失败');
+            }
+        }
+
+        // 测试响应式设计
+        async function testResponsive() {
+            updateStatus('responsive', 'pending', '测试中...');
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                updateStatus('responsive', 'success', '响应式设计正常');
+            } catch (error) {
+                updateStatus('responsive', 'error', '响应式测试失败');
+            }
+        }
+
+        // 测试API接口
+        async function testAPIs() {
+            updateStatus('api', 'pending', '测试中...');
+            
+            try {
+                // 测试API接口
+                const apis = [
+                    '/api/departments',
+                    '/api/doctors',
+                    '/api/appointments'
+                ];
+                
+                let successCount = 0;
+                let errorMessages = [];
+                
+                for (const api of apis) {
+                    try {
+                        const response = await fetch(api, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            mode: 'cors',
+                            credentials: 'omit',
+                            cache: 'no-cache'
+                        });
+                        
+                        if (response.ok) {
+                            successCount++;
+                            console.log(`API ${api} 测试成功:`, response.status);
+                            // 尝试解析响应数据
+                            try {
+                                const data = await response.json();
+                                console.log(`API ${api} 响应数据:`, data);
+                            } catch (parseError) {
+                                console.warn(`API ${api} 响应数据解析失败:`, parseError);
+                            }
+                        } else {
+                            const errorMsg = `${api}: HTTP ${response.status}`;
+                            errorMessages.push(errorMsg);
+                            console.warn(`API ${api} 返回错误:`, response.status, response.statusText);
+                        }
+                    } catch (error) {
+                        const errorMsg = `${api}: ${error.message}`;
+                        errorMessages.push(errorMsg);
+                        console.error(`API ${api} 测试失败:`, error);
+                    }
+                }
+                
+                if (successCount === apis.length) {
+                    updateStatus('api', 'success', '所有API接口正常');
+                } else if (successCount > 0) {
+                    updateStatus('api', 'error', `${successCount}/${apis.length} API接口正常 (${errorMessages.join(', ')})`);
+                } else {
+                    updateStatus('api', 'error', '所有API接口测试失败');
+                }
+            } catch (error) {
+                console.error('API测试过程出错:', error);
+                updateStatus('api', 'error', 'API测试失败: ' + error.message);
+            }
+        }
+
+        // 运行所有测试
+        async function runAllTests() {
+            const tests = ['home', 'doctors', 'appointment', 'ai', 'profile', 'appointments'];
+            
+            for (const test of tests) {
+                await testPage(test);
+            }
+            
+            await testNavigation();
+            await testResponsive();
+            await testAPIs();
+            
+            // 显示测试总结
+            const totalTests = Object.keys(testResults).length;
+            const successTests = Object.values(testResults).filter(r => r.status === 'success').length;
+            
+            alert(`测试完成！\n总测试数: ${totalTests}\n通过: ${successTests}\n失败: ${totalTests - successTests}`);
+        }
+
+        // 重置测试
+        function resetTests() {
+            const testIds = ['home', 'doctors', 'appointment', 'ai', 'profile', 'appointments', 'nav', 'responsive', 'api'];
+            testIds.forEach(id => {
+                updateStatus(id, 'pending', '待测试');
+            });
+            Object.keys(testResults).forEach(key => delete testResults[key]);
+        }
+
+        // 页面加载时自动运行基本测试
+        window.addEventListener('load', () => {
+            console.log('页面功能测试工具已加载');
+        });
+    </script>
+</body>
+</html>

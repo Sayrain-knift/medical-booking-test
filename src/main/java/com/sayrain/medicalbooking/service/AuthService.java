@@ -7,4 +7,7 @@ import com.sayrain.medicalbooking.dto.RegisterRequest;
 public interface AuthService {
     String registerUser(RegisterRequest registerRequest);
     AuthResponse loginUser(LoginRequest loginRequest);
+    String logout(String token);
+    boolean isTokenValid(String token);
+    void refreshUserCache(String username);
 }

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>预约修复测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>预约功能修复验证</h1>
+    <div id="test-results"></div>
+
+    <script>
+        async function runTests() {
+            const results = document.getElementById('test-results');
+            
+            // 测试1: 检查API端点
+            try {
+                const response = await fetch('/api/appointments/my-appointments', {
+                    headers: {
+                        'Authorization': 'Bearer ' + getCookie('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML += '<div class="test-result success">✓ API端点正常工作，返回数据结构正确</div>';
+                    results.innerHTML += `<div class="test-result info">返回预约数量: ${data.data ? data.data.length : 0}</div>`;
+                } else {
+                    results.innerHTML += '<div class="test-result error">✗ API端点访问失败: ' + response.status + '</div>';
+                }
+            } catch (error) {
+                results.innerHTML += '<div class="test-result error">✗ API测试失败: ' + error.message + '</div>';
+            }
+
+            // 测试2: 检查前端页面是否可访问
+            try {
+                const pageResponse = await fetch('/appointments.html');
+                if (pageResponse.ok) {
+                    results.innerHTML += '<div class="test-result success">✓ 前端页面可正常访问</div>';
+                } else {
+                    results.innerHTML += '<div class="test-result error">✗ 前端页面访问失败</div>';
+                }
+            } catch (error) {
+                results.innerHTML += '<div class="test-result error">✗ 前端页面测试失败: ' + error.message + '</div>';
+            }
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        // 页面加载后运行测试
+        window.onload = runTests;
+    </script>
+</body>
+</html>

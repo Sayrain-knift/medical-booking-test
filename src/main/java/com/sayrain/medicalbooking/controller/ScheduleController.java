@@ -56,15 +56,15 @@ public class ScheduleController {
 
     @Operation(summary = "获取所有排班", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping
-    public ResponseResult<List<Schedule>> getAllSchedules() {
-        List<Schedule> schedules = scheduleService.getAllSchedules();
+    public ResponseResult<List<ScheduleDTO>> getAllSchedules() {
+        List<ScheduleDTO> schedules = scheduleService.getAllSchedulesAsDTO();
         return new ResponseResult<>(200, "获取所有排班成功", schedules);
     }
 
     @Operation(summary = "根据医生ID获取排班", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/doctor/{doctorId}")
-    public ResponseResult<List<Schedule>> getSchedulesByDoctor(@PathVariable Long doctorId) {
-        List<Schedule> schedules = scheduleService.getSchedulesByDoctor(doctorId);
+    public ResponseResult<List<ScheduleDTO>> getSchedulesByDoctor(@PathVariable Long doctorId) {
+        List<ScheduleDTO> schedules = scheduleService.getSchedulesByDoctorAsDTO(doctorId);
         return new ResponseResult<>(200, "获取医生排班成功", schedules);
     }
 

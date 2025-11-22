@@ -187,7 +187,7 @@ class AppointmentServiceTest {
     // 根据患者ID查询预约
     @Test
     void testGetAppointmentsByPatient() {
-        when(appointmentRepository.findByPatientId(1L)).thenReturn(List.of(existingAppointment));
+        when(appointmentRepository.findActiveAppointmentsByPatientId(1L)).thenReturn(List.of(existingAppointment));
 
         List<Appointment> list = appointmentService.getPatientAppointments(1L);
 

@@ -1,0 +1,26 @@
+# ==========================
+# Spring Cloud Bootstrap 配置
+# ==========================
+spring:
+  application:
+    name: medical-booking-system
+  # 暂时禁用Nacos配置
+  # cloud:
+  #   nacos:
+  #     server-addr: localhost:8848
+  #     config:
+  #       enabled: true
+  #       file-extension: yml
+  #       namespace: 
+  #       group: DEFAULT_GROUP
+  #       refresh-enabled: true
+  #     discovery:
+  #       enabled: false
+
+# ==========================
+# 日志配置（Bootstrap阶段）
+# ==========================
+logging:
+  level:
+    com.alibaba.cloud.nacos: DEBUG
+    org.springframework.cloud: DEBUG

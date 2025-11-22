@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录状态测试</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>登录状态测试页面</h1>
+        
+        <div class="mt-4">
+            <h3>当前登录状态</h3>
+            <div id="statusDisplay" class="alert alert-info">
+                检查中...
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h3>测试操作</h3>
+            <button class="btn btn-primary me-2" onclick="testLogin()">模拟登录</button>
+            <button class="btn btn-danger me-2" onclick="testLogout()">模拟退出</button>
+            <button class="btn btn-info me-2" onclick="checkStatus()">检查状态</button>
+            <button class="btn btn-success" onclick="testUIUpdate()">测试UI更新</button>
+        </div>
+        
+        <div class="mt-4">
+            <h3>导航栏测试</h3>
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                <div class="container">
+                    <a class="navbar-brand fw-bold" href="/">
+                        <i class="bi bi-hospital text-primary me-2"></i>医疗预约系统
+                    </a>
+                    
+                    <div class="d-flex align-items-center">
+                        <div id="userSection" class="d-none">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    <span id="username">用户</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/profile.html">个人中心</a></li>
+                                    <li><a class="dropdown-item" href="/appointments.html">我的预约</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="authManager.logout()">退出登录</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="authSection">
+                            <a href="/login" class="btn btn-outline-primary me-2">登录</a>
+                            <a href="/register" class="btn btn-primary">注册</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="mt-4">
+            <h3>调试信息</h3>
+            <pre id="debugInfo" class="bg-light p-3"></pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        function updateStatusDisplay() {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const debugInfo = document.getElementById('debugInfo');
+            
+            const isLoggedIn = authManager.isLoggedIn();
+            const currentUser = authManager.getCurrentUser();
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            
+            statusDisplay.className = `alert ${isLoggedIn ? 'alert-success' : 'alert-warning'}`;
+            statusDisplay.innerHTML = `
+                <strong>登录状态:</strong> ${isLoggedIn ? '已登录' : '未登录'}<br>
+                <strong>当前用户:</strong> ${currentUser ? currentUser.username : '无'}<br>
+                <strong>Token存在:</strong> ${!!token}<br>
+                <strong>用户数据存在:</strong> ${!!userStr}
+            `;
+            
+            debugInfo.textContent = JSON.stringify({
+                isLoggedIn,
+                currentUser,
+                token: token ? token.substring(0, 50) + '...' : null,
+                userStr: userStr ? JSON.parse(userStr) : null,
+                userSectionVisible: !document.getElementById('userSection').classList.contains('d-none'),
+                authSectionVisible: !document.getElementById('authSection').classList.contains('d-none')
+            }, null, 2);
+        }
+        
+        function testLogin() {
+            // 模拟登录数据
+            const mockUser = {
+                username: 'testuser',
+                role: 'PATIENT'
+            };
+            const mockToken = 'mock.jwt.token';
+            
+            localStorage.setItem('token', mockToken);
+            localStorage.setItem('user', JSON.stringify(mockUser));
+            authManager.currentUser = mockUser;
+            authManager.updateUI();
+            
+            updateStatusDisplay();
+        }
+        
+        function testLogout() {
+            authManager.logout();
+            updateStatusDisplay();
+        }
+        
+        function checkStatus() {
+            updateStatusDisplay();
+        }
+        
+        function testUIUpdate() {
+            authManager.updateUI();
+            updateStatusDisplay();
+        }
+        
+        // 页面加载完成后检查状态
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(updateStatusDisplay, 100);
+        });
+    </script>
+</body>
+</html>

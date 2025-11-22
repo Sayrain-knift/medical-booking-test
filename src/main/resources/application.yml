@@ -2,6 +2,9 @@
 # Spring Boot 核心配置
 # ==========================
 spring:
+  profiles:
+    active: minimal
+  
   # AI 配置
   ai:
     ollama:
@@ -54,10 +57,16 @@ spring:
 
   # 缓存配置
   cache:
-    type: none
+    type: redis
     redis:
+      # 默认缓存过期时间：30分钟
       time-to-live: 1800000
+      # 不缓存null值
       cache-null-values: false
+      # 缓存键前缀
+      key-prefix: "medical:cache:"
+      # 使用键前缀
+      use-key-prefix: true
 
   # Spring Security 配置
   security:
@@ -82,6 +91,61 @@ spring:
   # 应用配置
   application:
     name: medical-booking-system
+  
+  # 允许循环引用
+  main:
+    allow-circular-references: true
+
+  # Jackson 配置
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    modules:
+      - com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+
+  # RabbitMQ 配置
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 2
+        max-concurrency: 10
+        prefetch: 1
+
+  # Sentinel 配置
+  cloud:
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8858}
+        port: 8719
+      eager: true
+      log:
+        dir: logs/sentinel
+      # 流控效果配置
+      flow:
+        default-grade: 1  # 默认流控模式：直接拒绝
+        default-count: 50  # 默认阈值
+        default-strategy: 0  # 默认流控策略：直接
+      # 降级配置
+      degrade:
+        default-grade: 0  # 默认降级策略：慢调用比例
+        default-count: 1000  # 默认RT阈值
+        default-time-window: 10  # 默认时间窗口
+        default-min-request-amount: 5  # 默认最小请求数
+        default-slow-ratio-threshold: 1.0  # 默认慢调用比例阈值
+      # 系统保护配置
+      system:
+        highest-system-load: -1  # 系统最高负载
+        highest-cpu-usage: -1  # 最高CPU使用率
+        avg-rt: -1  # 平均响应时间
+        max-thread: -1  # 最大线程数
+        qps: -1  # 每秒查询率
 
 # ==========================
 # 日志配置
@@ -241,3 +305,15 @@ medical:
 #  access-secret: your-access-secret
 #  sign-name: 医疗挂号系统
 #  template-code: SMS_123456789
+
+# ==========================
+# 监控配置
+# ==========================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,sentinel
+  endpoint:
+    health:
+      show-details: always
