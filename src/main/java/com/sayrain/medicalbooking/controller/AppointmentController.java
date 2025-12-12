@@ -263,7 +263,7 @@ public class AppointmentController {
                 Long userId = userDetails.getUserId();
 
                 // 通过用户ID查询患者
-                Patient patient = (Patient) patientRepository.findByUserId(userId)
+                Patient patient = patientRepository.findByUserId(userId)
                         .orElseThrow(() -> new RuntimeException("患者信息不存在，用户ID: " + userId));
 
                 return patient.getId();

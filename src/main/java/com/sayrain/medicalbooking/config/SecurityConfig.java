@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/departments/**").hasRole("ADMIN")   // 仅管理员可修改
                 .requestMatchers(HttpMethod.DELETE, "/api/departments/**").hasRole("ADMIN")// 仅管理员可删除
 
-                .requestMatchers("/api/chat/ask").permitAll() // 放行聊天接口
+                .requestMatchers("/api/ai/chat/**").permitAll() // 放行AI聊天接口
                 .requestMatchers("/error").permitAll() // 放行错误页面接口
                 .requestMatchers("/actuator/**").permitAll() // 放行actuator监控端点
                 .requestMatchers("/swagger-ui.html").permitAll()

@@ -43,7 +43,7 @@ public class AuthController {
             String errorMessage = e.getMessage();
             if (errorMessage != null && errorMessage.contains("Unique index or primary key violation") && errorMessage.contains("USERNAME")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new AuthResponse(null, null, null, "Username already exists"));
+                        .body(new AuthResponse(null, null, null, "用户名已存在"));
             }
             // 其他异常
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService{
         
         // 检查用户名是否已经存在
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new IllegalArgumentException("用户名已存在");
         }
 
         // 创建新用户对象
